@@ -6,17 +6,23 @@ namespace BridgePattern
     {
         private readonly Discount _discount;
         private readonly LicenceType _licenceType;
+        private readonly SpecialOffer _specialOffer;
 
         public string Movie { get; }
         public DateTime PurchaseTime { get; }
 
         public MovieLicense(
-            string movie, DateTime purchaseTime, Discount discount, LicenceType licenceType)
+            string movie,
+            DateTime purchaseTime,
+            Discount discount,
+            LicenceType licenceType,
+            SpecialOffer specialOffer = SpecialOffer.None)
         {
             Movie = movie;
             PurchaseTime = purchaseTime;
             _discount = discount;
             _licenceType = licenceType;
+            _specialOffer = specialOffer;
         }
 
         public decimal GetPrice()
@@ -51,6 +57,25 @@ namespace BridgePattern
 
         public DateTime? GetExpirationDate()
         {
+            DateTime? expirationDate = GetBaseExpirationDate();
+            TimeSpan extension = GetSpecialOfferExtension();
+
+            return expirationDate?.Add(extension);
+        }
+
+        private TimeSpan GetSpecialOfferExtension()
+        {
+            return _specialOffer switch
+            {
+                SpecialOffer.None => TimeSpan.Zero,
+                SpecialOffer.TwoDaysExtension => TimeSpan.FromDays(2),
+
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        private DateTime? GetBaseExpirationDate()
+        {
             return _licenceType switch
             {
                 LicenceType.TwoDays => PurchaseTime.AddDays(2) as DateTime?,
@@ -74,18 +99,9 @@ namespace BridgePattern
         Senior
     }
 
-
-    //public class SpecialOfferSeniorTwoDaysLicense : SeniorTwoDaysLicense
-    //{
-    //    public SpecialOfferSeniorTwoDaysLicense(string movie, DateTime purchaseTime)
-    //        : base(movie, purchaseTime)
-    //    {
-    //    }
-
-    //    public override DateTime? GetExpirationDate()
-    //    {
-    //        DateTime? expirationDate = base.GetExpirationDate();
-    //        return expirationDate?.AddDays(2);
-    //    }
-    //}
+    public enum SpecialOffer
+    {
+        None,
+        TwoDaysExtension
+    }
 }

@@ -20,6 +20,10 @@ namespace BridgePattern
             PrintLicenseDetails(license3);
             PrintLicenseDetails(license4);
 
+            var license5 = new MovieLicense("Matrix", now, Discount.Senior, LicenceType.TwoDays, SpecialOffer.TwoDaysExtension);
+
+            PrintLicenseDetails(license5);
+
             Console.ReadKey();
         }
 
